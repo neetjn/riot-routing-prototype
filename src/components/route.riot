@@ -1,0 +1,18 @@
+<route>
+  <router-view></router-view>
+  <script>
+    export default {
+      showRoute() {
+        if (this.props.state) {
+          this.$$('router-view').innerHTML = this.props.state.component.name
+        }
+      },
+      onMounted() {
+        this.showRoute()
+      },
+      onUpdated() {
+        this.showRoute()        
+      }
+    }
+  </script>
+</route>

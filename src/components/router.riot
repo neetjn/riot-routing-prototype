@@ -1,0 +1,48 @@
+<router>
+  <route />
+  <script>
+    import Router from 'core-routing/dist/router.dev.js'
+    import Route from '../components/route.riot'
+    export default {
+      components: {
+        Route,
+      },
+      state: {
+        route: {}
+      },
+      onBeforeMount() {
+        this.props.routes.forEach(route => {
+          if (!Array.isArray(route.path)) {
+            route.path = [route.path]
+          }
+        })
+      },
+      onMounted() {
+        const self = this
+        this.router = new Router({
+          client: {
+            onStart() {
+              console.log('router started')
+            },
+            onNavigate(e) {
+              console.log('router navigated')
+              const route = self.props.routes.find(r => {
+                return r.path.find(path => {
+                  return e.$tools.match(e.location.path, path)
+                })
+              })
+              console.log(route)
+              if (route) {
+                self.state.route = route
+              }
+            },
+            onStop() {
+              console.log('router stopped')
+            }
+          }
+        })
+        this.router.start()
+      },
+    }
+  </script>
+</router>
