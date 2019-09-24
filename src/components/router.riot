@@ -1,17 +1,21 @@
 <router>
-  <route />
+  <div id="view" />
+  <h1 class="text-center text-3xl">
+    Route Deteted: { state.route ? state.route.component.name : '_' }
+  </h1>
   <script>
     import Router from 'core-routing/dist/router.dev.js'
-    import Route from '../components/route.riot'
+    // import Route from '../components/route.riot'
     export default {
       components: {
-        Route,
+        // Route,
       },
       state: {
-        route: {}
+        route: null
       },
       onBeforeMount() {
         this.props.routes.forEach(route => {
+          this.components[route.component.name] = route.component
           if (!Array.isArray(route.path)) {
             route.path = [route.path]
           }
@@ -21,28 +25,28 @@
         const self = this
         this.router = new Router({
           client: {
-            onStart() {
-              console.log('router started')
-            },
             onNavigate(e) {
-              console.log('router navigated')
               const route = self.props.routes.find(r => {
                 return r.path.find(path => {
                   return e.$tools.match(e.location.path, path)
                 })
               })
-              console.log(route)
               if (route) {
                 self.state.route = route
+                self.update()
               }
             },
-            onStop() {
-              console.log('router stopped')
-            }
           }
         })
         this.router.start()
       },
+      onBeforeUpdated() {
+        if (this.state.route) {
+          this.$$('#view').innerHTML = `<${this.state.route.component.name} />`;
+          // this.mount(this.$$('view', this.state.route.component))
+          // this.state.route.component(this.$$('#view'))
+        }
+      }
     }
   </script>
 </router>

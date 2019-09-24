@@ -8,7 +8,8 @@
     "pretty": "npx prettier-eslint --write src/**/**.js",
     "bundle": "./node_modules/.bin/webpack --config webpack.config.js",
     "build": "npm run lint && npm run pretty && npm run bundle",
-    "test": "npm run lint"
+    "test": "npm run lint",
+    "start": "npx webpack-dev-server --config webpack.config.js --output-public-path /dist/ --port 3300"
   },
   "repository": {
     "type": "git",
