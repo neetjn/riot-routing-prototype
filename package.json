@@ -26,6 +26,7 @@
     "@fullhuman/postcss-purgecss": "^1.2.0",
     "@icon/entypo": "^1.0.0",
     "@riotjs/compiler": "^4.1.1",
+    "@riotjs/hot-reload": "^4.0.0",
     "@riotjs/webpack-loader": "^4.0.0",
     "autoprefixer": "^9.5.1",
     "babel-eslint": "^10.0.1",
