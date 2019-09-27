@@ -1,21 +1,21 @@
 <router>
-  <div id="view" />
-  <h1 class="text-center text-3xl">
-    Route Deteted: { state.route ? state.route.component.name : '_' }
+  <h1 class="text-bold text-3xl">
+    Route: { state.route ? state.route.component.name : '_' }
   </h1>
+  <div id="router-context">
+    <div />
+  </div>
   <script>
+    import { component } from 'riot'
     import Router from 'core-routing/dist/router.dev.js'
-    // import Route from '../components/route.riot'
     export default {
-      components: {
-        // Route,
-      },
       state: {
-        route: null
+        route: null,
+        mounted: null
       },
       onBeforeMount() {
         this.props.routes.forEach(route => {
-          this.components[route.component.name] = route.component
+          route.component = component(route.component)
           if (!Array.isArray(route.path)) {
             route.path = [route.path]
           }
@@ -31,21 +31,20 @@
                   return e.$tools.match(e.location.path, path)
                 })
               })
+              // TODO: left here, figure out how to not destroy parent on unmount
               if (route) {
+                const ctx = self.$('#router-context')
+                if (self.state.mounted) {
+                  self.state.mounted.unmount()
+                }
                 self.state.route = route
-                self.update()
+                self.state.mounted = self.state.route.component(ctx)
+                // self.update()
               }
             },
           }
         })
         this.router.start()
-      },
-      onBeforeUpdated() {
-        if (this.state.route) {
-          this.$$('#view').innerHTML = `<${this.state.route.component.name} />`;
-          // this.mount(this.$$('view', this.state.route.component))
-          // this.state.route.component(this.$$('#view'))
-        }
       }
     }
   </script>

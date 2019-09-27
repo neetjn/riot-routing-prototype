@@ -1,32 +1,30 @@
 <page>
-  <img class="block m-auto mt-5 mb-4" src={ Logo } width="150" height="auto">
   <h1 class="text-center mt-4 mb-4">
     <i class="entypo entypo-alert" /> Hello World
   </h1>
   <router default="/" routes={ routes }></router>
   <script>
-    import Logo from '../assets/images/riot.svg'
-
     import Router from '../components/router.riot'
-    
+
     import Home from '../views/home.riot'
     import NotFound from '../views/not-found.riot'
 
+    const routes = [
+      {
+        component: Home,
+        path: ['/', '/home']
+      },
+      {
+        component: NotFound,
+        path: '*'
+      }
+    ];
+
     export default {
-      Logo,
+      routes,
       components: {
         Router,
-      },
-      routes: [
-        {
-          component: Home,
-          path: ['/', '/home']
-        },
-        {
-          component: NotFound,
-          path: '*'
-        }
-      ]
+      }
     }
   </script>
 </page>
