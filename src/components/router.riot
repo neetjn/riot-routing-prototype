@@ -23,6 +23,7 @@
       onMounted() {
         const self = this
         const state = self.state
+        
         self.router = new Router({
           client: {
             onNavigate(e) {
@@ -38,10 +39,12 @@
                 route.active = true
                 state.route = route
               }
+              // TODO: figure out how to extract route args/qargs
               self.update()
             },
           }
         })
+
         self.router.start()
       }
     }
