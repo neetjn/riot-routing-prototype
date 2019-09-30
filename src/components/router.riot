@@ -2,49 +2,47 @@
   <h1 class="text-bold text-3xl">
     Route: { state.route ? state.route.component.name : '_' }
   </h1>
-  <div id="router-context">
-    <div />
-  </div>
+  <route each={route in state.routes} if={route.active} component={route.component} /></route>
   <script>
-    import { component } from 'riot'
     import Router from 'core-routing/dist/router.dev.js'
+    import Route from './route.riot'
+
     export default {
       state: {
-        route: null,
-        mounted: null
+        routes: [],
+        route: undefined,
       },
       onBeforeMount() {
-        this.props.routes.forEach(route => {
-          route.component = component(route.component)
-          if (!Array.isArray(route.path)) {
-            route.path = [route.path]
-          }
-        })
+        this.state.routes.push(...this.props.routes.map(route => {
+          return Object.assign(route, {
+            active: false,
+            path: Array.isArray(route.path) ? route.path : [route.path] 
+          })
+        }))
       },
       onMounted() {
         const self = this
-        this.router = new Router({
+        const state = self.state
+        self.router = new Router({
           client: {
             onNavigate(e) {
-              const route = self.props.routes.find(r => {
+              const route = state.routes.find(r => {
                 return r.path.find(path => {
                   return e.$tools.match(e.location.path, path)
                 })
               })
-              // TODO: left here, figure out how to not destroy parent on unmount
-              if (route) {
-                const ctx = self.$('#router-context')
-                if (self.state.mounted) {
-                  self.state.mounted.unmount()
-                }
-                self.state.route = route
-                self.state.mounted = self.state.route.component(ctx)
-                // self.update()
+              if (state.route) {
+                state.route.active = false
               }
+              if (route) {
+                route.active = true
+                state.route = route
+              }
+              self.update()
             },
           }
         })
-        this.router.start()
+        self.router.start()
       }
     }
   </script>

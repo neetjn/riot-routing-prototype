@@ -1,0 +1,15 @@
+<route>
+  <div id={ `component-${ props.component.name }` } />
+  <script>
+    import { component } from 'riot'
+
+    export default {
+      onMounted() {
+        const context = this.$(`component-${this.props.component.name}`)
+        const Component = component(this.props.component)
+        Component(context)
+        console.log(this.props.component)
+      }
+    }    
+  </script>
+</route>
