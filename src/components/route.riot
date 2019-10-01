@@ -5,10 +5,12 @@
 
     export default {
       onMounted() {
-        const context = this.$(`component-${this.props.component.name}`)
-        const Component = component(this.props.component)
-        Component(context)
         console.log(this.props.component)
+        const context = this.$(`#component-${this.props.component.name}`)
+        console.log(context)
+        const Component = component(this.props.component)
+        console.log(Component)
+        Component(context)
       }
     }    
   </script>

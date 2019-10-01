@@ -1,11 +1,12 @@
 <router>
   <h1 class="text-bold text-3xl">
-    Route: { state.route ? state.route.component.name : '_' }
+    Route: { state.route ? state.route.component.name : 'NaN' }
   </h1>
-  <route each={route in state.routes} if={route.active} component={route.component} /></route>
+  <slot if={state.route} is={state.route.component.name}></slot>
+
   <script>
+    import { register } from 'riot'
     import Router from 'core-routing/dist/router.dev.js'
-    import Route from './route.riot'
 
     export default {
       state: {
@@ -14,6 +15,12 @@
       },
       onBeforeMount() {
         this.state.routes.push(...this.props.routes.map(route => {
+          // riot.js loader creates a semantic component
+          // component can be defined using riot.component(*)
+          // or component can be registered using riot.register(name, component)
+          // registering to use html element as component
+          // source: https://riot.js.org/documentation/#html-elements-as-components 
+          register(route.component.name, route.component)
           return Object.assign(route, {
             active: false,
             path: Array.isArray(route.path) ? route.path : [route.path] 
@@ -22,30 +29,28 @@
       },
       onMounted() {
         const self = this
-        const state = self.state
         
-        self.router = new Router({
+        const router = new Router({
           client: {
             onNavigate(e) {
-              const route = state.routes.find(r => {
+              const route = self.state.routes.find(r => {
                 return r.path.find(path => {
                   return e.$tools.match(e.location.path, path)
                 })
               })
-              if (state.route) {
-                state.route.active = false
+              if (self.state.route) {
+                self.state.route.active = false
               }
               if (route) {
                 route.active = true
-                state.route = route
+                self.state.route = route
               }
-              // TODO: figure out how to extract route args/qargs
               self.update()
             },
           }
         })
 
-        self.router.start()
+        router.start()
       }
     }
   </script>
