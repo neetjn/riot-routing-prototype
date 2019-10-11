@@ -7,8 +7,6 @@
   <script>
     import { register } from 'riot'
     import Router from 'core-routing/dist/router.dev.js'
-    
-    // TODO: left here, add functionality for default route
 
     export default {
       state: {
@@ -21,34 +19,58 @@
           // component can be defined using riot.component(*)
           // or component can be registered using riot.register(name, component)
           // registering to use html element as component
-          // source: https://riot.js.org/documentation/#html-elements-as-components 
+          // source: https://riot.js.org/documentation/#html-elements-as-components
           register(route.component.name, route.component)
           return Object.assign(route, {
             active: false,
-            path: Array.isArray(route.path) ? route.path : [route.path] 
+            path: Array.isArray(route.path) ? route.path : [route.path]
           })
         }))
       },
       onMounted() {
         const self = this
-        
+
+        const findRoute = (e) => {
+          return this.state.routes.find(r => {
+            return r.path.find(path => {
+              return e.$tools.match(e.location.path, path)
+            })
+          })
+        }
+
+        const handleRoute = (e, route = null) => {
+          route = route || findRoute(e)
+          if (self.state.route) {
+            this.state.route.active = false
+          }
+          if (route) {
+            route.active = true
+            this.state.route = route
+          }
+          this.update()
+        }
+
+        const startRouter = (e) => {
+          // TODO: add handler for no route
+          console.log('made it here? 1')
+          if (this.props.default) {
+            console.log('made it here? 2')
+            const baseRoute = findRoute(e)
+            console.log(baseRoute)
+            if (!baseRoute) {
+              console.log('made it here? 3')
+              // trigger navigate, will take care of the rest
+              window.location.hash = `#!${this.props.default}`
+            } else {
+              handleRoute(e, baseRoute)
+            }
+          }
+        }
+
         const router = new Router({
           client: {
-            onNavigate(e) {
-              const route = self.state.routes.find(r => {
-                return r.path.find(path => {
-                  return e.$tools.match(e.location.path, path)
-                })
-              })
-              if (self.state.route) {
-                self.state.route.active = false
-              }
-              if (route) {
-                route.active = true
-                self.state.route = route
-              }
-              self.update()
-            },
+            onStart: startRouter,
+            onNavigate: handleRoute,
           }
         })
 
