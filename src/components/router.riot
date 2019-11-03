@@ -30,12 +30,22 @@
       onMounted() {
         const self = this
 
+        const navigatePath = (path) => {
+          // set hash to default
+          // will trigger navigation event and handle route
+          window.location.hash = `#!${path}`
+        }
+
         const findRoute = (e) => {
           return this.state.routes.find(r => {
             return r.path.find(path => {
               return e.$tools.match(e.location.path, path)
             })
           })
+        }
+
+        const findRouteByName = (name) => {
+          return this.states.routes.find(r => r.name === name)
         }
 
         const handleRoute = (e, route = null) => {
@@ -46,24 +56,17 @@
           if (route) {
             route.active = true
             this.state.route = route
+          } else if (this.props.fallback) {
+            navigatePath(this.props.fallback)
           }
           this.update()
         }
 
         const startRouter = (e) => {
-          // TODO: add handler for no route
-          console.log('made it here? 1')
-          if (this.props.default) {
-            console.log('made it here? 2')
-            const baseRoute = findRoute(e)
-            console.log(baseRoute)
-            if (!baseRoute) {
-              console.log('made it here? 3')
-              // trigger navigate, will take care of the rest
-              window.location.hash = `#!${this.props.default}`
-            } else {
-              handleRoute(e, baseRoute)
-            }
+          if (this.props.default && !e.location.hash) {
+            navigatePath(this.props.default)
+          } else {
+            handleRoute(e)
           }
         }
 

@@ -2,11 +2,20 @@
   <h1 class="text-center mt-4 mb-4">
     <i class="entypo entypo-alert" /> Hello World
   </h1>
-  <router default="/" routes={ routes }></router>
+  <!-- fallback only works, if no route has a wildcard
+       otherwise match will resole the wildcard route
+       and it will render without redirecting -->
+  <!--
+    props:
+      default: path to route to if no hash detected
+      fallback: path to route to if no route is matched
+  -->
+  <router default="/" fallback="/not-found" routes={ routes }></router>
   <script>
     import Router from '../components/router.riot'
 
     import Home from '../views/home.riot'
+    import Random from '../views/random.riot'
     import NotFound from '../views/not-found.riot'
 
     const routes = [
@@ -15,8 +24,12 @@
         path: ['/', '/home']
       },
       {
+        component: Random,
+        path: '/user/:id/random'
+      },
+      {
         component: NotFound,
-        path: '*'
+        path: '/not-found'
       }
     ]
 
