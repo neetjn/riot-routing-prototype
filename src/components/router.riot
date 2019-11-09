@@ -1,30 +1,36 @@
 <router>
-  <h1 class="text-bold text-3xl">
-    Route: { state.route ? state.route.component.name : 'NaN' }
-  </h1>
-  <slot if={state.route} is={state.route.component.name}></slot>
+  <slot if={route}
+        is={route.source.component.name}
+        data={route}></slot>
 
   <script>
     import { register } from 'riot'
     import Router from 'core-routing/dist/router.dev.js'
 
     export default {
+      routes: [],
       state: {
-        routes: [],
-        route: undefined,
+        // route state as linked list
+        // if no route matched, store as nil
+        route: [],
+      },
+      get route() {
+        return this.state.route.length ? this.state.route.slice(-1)[0] : null;
       },
       onBeforeMount() {
-        this.state.routes.push(...this.props.routes.map(route => {
+        this.routes.push(...this.props.routes.map(route => {
           // riot.js loader creates a semantic component
           // component can be defined using riot.component(*)
           // or component can be registered using riot.register(name, component)
           // registering to use html element as component
           // source: https://riot.js.org/documentation/#html-elements-as-components
           register(route.component.name, route.component)
-          return Object.assign(route, {
-            active: false,
-            path: Array.isArray(route.path) ? route.path : [route.path]
-          })
+          // store routes as immutable objects
+          return Object.freeze(
+            Object.assign(route, {
+              path: Array.isArray(route.path) ? route.path : [route.path]
+            })
+          )
         }))
       },
       onMounted() {
@@ -36,30 +42,36 @@
           window.location.hash = `#!${path}`
         }
 
-        const findRoute = (e) => {
-          return this.state.routes.find(r => {
+        const matchRoute = (e) => {
+          return this.routes.find(r => {
             return r.path.find(path => {
               return e.$tools.match(e.location.path, path)
             })
           })
         }
 
-        const findRouteByName = (name) => {
-          return this.states.routes.find(r => r.name === name)
+        const RouteState = (e, route) => {
+          // for arg/qarg extraction assume --
+          // route only has one path
+          const result = e.$tools.process(e.location.path, route.path[0])
+          return {
+            source: route,
+            args: result.variables,
+            qargs: result.args
+          }
         }
 
-        const handleRoute = (e, route = null) => {
-          route = route || findRoute(e)
-          if (self.state.route) {
-            this.state.route.active = false
-          }
+        const handleRoute = (e) => {
+          const route = matchRoute(e)
           if (route) {
-            route.active = true
-            this.state.route = route
-          } else if (this.props.fallback) {
-            navigatePath(this.props.fallback)
+            this.state.route.push(RouteState(e, route))
+            this.update()
+          } else {
+            this.state.route.push(null)
+            if (this.props.fallback) {
+              navigatePath(this.props.fallback)
+            }
           }
-          this.update()
         }
 
         const startRouter = (e) => {
