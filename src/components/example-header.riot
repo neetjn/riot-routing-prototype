@@ -4,11 +4,18 @@
     <li each={ route in props.routes }
         class="inline mr-4 font-bold text-lg
                { activeRoute(route) ? 'active' : '' }">
-      { route.name }
+      <link-to sref={ Array.isArray(route.path) ? route.path.slice(-1)[0] : route.path }>
+        { route.name }
+      </link-to>
     </li>
   </ul>
   <script>
+    import LinkTo from '../components/link-to.riot'
+
     export default {
+      components: {
+        LinkTo
+      },
       activeRoute(route) {
         return this.router.route ? this.router.route.name === route.name : false
       },

@@ -6,6 +6,7 @@
   <h1 class="text-center mt-4 mb-4" if={ state.route }>
     Current Route: { state.route }
   </h1>
+  <br />
   <!-- fallback only works, if no route has a wildcard
        otherwise match will resole the wildcard route
        and it will render without redirecting -->
@@ -22,7 +23,6 @@
           stateChanged={ stateChanged }></router>
   <script>
     import Router from '../components/router.riot'
-    import Link from '../components/link.riot'
 
     import ExampleHeader from '../components/example-header.riot'
 
@@ -60,7 +60,6 @@
     export default {
       components: {
         Router,
-        Link,
         ExampleHeader,
       },
       routes,
