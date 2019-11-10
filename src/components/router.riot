@@ -90,6 +90,11 @@
         })
 
         router.start()
+      },
+      onUpdated() {
+        if (this.props.stateChanged) {
+          this.props.stateChanged(this.route)
+        }
       }
     }
   </script>
