@@ -1,0 +1,26 @@
+<example-header>
+  <h1 class="font-extrabold text-3xl underline">Header</h1>
+  <ul class="unstyled">
+    <li each={ route in props.routes }
+        class="inline mr-4 font-bold text-lg
+               { activeRoute(route) ? 'active' : '' }">
+      { route.name }
+    </li>
+  </ul>
+  <script>
+    export default {
+      activeRoute(route) {
+        return this.router.route ? this.router.route.name === route.name : false
+      },
+      onBeforeMount() {
+        // push component to global state for updates
+        this.router.components.push(this)
+      },
+    }
+  </script>
+  <style>
+    li.active {
+      color: orange;
+    }
+  </style>
+</example-header>

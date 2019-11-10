@@ -1,4 +1,5 @@
 <page>
+  <example-header routes={ routes } />
   <h1 class="text-center mt-4 mb-4">
     <i class="entypo entypo-alert" /> Root
   </h1>
@@ -10,8 +11,10 @@
        and it will render without redirecting -->
   <!--
     props:
-      default: path to route to if no hash detected
-      fallback: path to route to if no route is matched
+      default: optional path to route to if no hash detected
+      fallback: optional path to route to if no route is matched
+      routes: list of route specifications for router
+      stateChanged: optional callback called when router state updated
   -->
   <router default="/"
           fallback="/not-found"
@@ -21,28 +24,34 @@
     import Router from '../components/router.riot'
     import Link from '../components/link.riot'
 
+    import ExampleHeader from '../components/example-header.riot'
+
     import Home from '../views/home.riot'
     import Random from '../views/random.riot'
     import NotFound from '../views/not-found.riot'
 
     const routes = [
       {
+        name: 'Home',
         component: Home,
         path: ['/', '/home']
       },
       {
+        name: 'User Random',
         component: Random,
         path: '/user/:id/random',
         condition: (data) => {
+          // Left here: complete conditional logic
           const userId = parseInt(data.args.id)
           if (userId && userId >= 0) {
             return true
           } else {
-            return '/'
+            return false
           }
         },
       },
       {
+        name: 'Not Found',
         component: NotFound,
         path: '/not-found'
       }
@@ -52,16 +61,14 @@
       components: {
         Router,
         Link,
+        ExampleHeader,
       },
       routes,
-      state: {
-        route: ''
-      },
       stateChanged(route) {
-        this.state.route = route.source.component.name
-        // Left here: How do I update without updating parent?
-        // more logically, I would probably need to pass this along to another child component...
-        //this.update()
+        // set global router state
+        this.router.route = route.source
+        // update each linked component
+        this.router.components.forEach(component => component.update())
       }
     }
   </script>
