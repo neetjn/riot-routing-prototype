@@ -40,13 +40,12 @@
         name: 'User Random',
         component: Random,
         path: '/user/:id/random',
-        condition: (data) => {
-          // Left here: complete conditional logic
+        condition: (data, transition) => {
           const userId = parseInt(data.args.id)
           if (userId && userId >= 0) {
-            return true
+            transition()
           } else {
-            return false
+            transition('/not-found')
           }
         },
       },

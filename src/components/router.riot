@@ -50,22 +50,36 @@
           })
         }
 
-        const RouteState = (e, route) => {
-          // for arg/qarg extraction assume --
-          // route only has one path
-          const result = e.$tools.process(e.location.path, route.path[0])
+        const RouteState = (route, details) => {
           return {
             source: route,
-            args: result.variables,
-            qargs: result.args
+            args: details.variables,
+            qargs: details.args
           }
         }
 
         const handleRoute = (e) => {
           const route = matchRoute(e)
           if (route) {
-            this.state.route.push(RouteState(e, route))
-            this.update()
+            // for arg/qarg extraction assume --
+            // route only has one path
+            const details = e.$tools.process(e.location.path, route.path[0])
+            const pushState = () => {
+              this.state.route.push(RouteState(route, details))
+              this.update()
+            }
+            if (route.condition) {
+              const transition = (path = null) => {
+                if (path) {
+                  navigatePath(route)
+                } else {
+                  pushState()
+                }
+              }
+              route.condition({args: details.variables, qargs: details.args}, transition);
+            } else {
+              pushState()
+            }
           } else {
             this.state.route.push(null)
             if (this.props.fallback) {
